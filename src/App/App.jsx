@@ -1,32 +1,58 @@
-// import userData from '../../userData.json';
-// import friends from '../../friends.json';
-// import transactions from '../../transactions.json';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Description from '../Description/Description.jsx';
 import Options from '../Options/Options.jsx';
 import Feedback from '../Feedback/Feedback.jsx';
+import Notification from '../Notification/Notification';
 
 const App = () => {
-  const [reviewsTypes, setReviews] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0,
+  const [reviews, setReviews] = useState(() => {
+    const savedReviews = JSON.parse(
+      window.localStorage.getItem('saved-reviews')
+    ) || { good: 0, neutral: 0, bad: 0 };
+    return savedReviews;
   });
+
+  useEffect(() => {
+    window.localStorage.setItem('saved-reviews', JSON.stringify(reviews));
+  }, [reviews]);
 
   const updateFeedback = feedbackType => {
     setReviews({
-      ...reviewsTypes,
-      [feedbackType]: reviewsTypes[feedbackType] + 1,
+      ...reviews,
+      [feedbackType]: reviews[feedbackType] + 1,
     });
   };
+
+  const resetFeedback = () => {
+    return setReviews({ good: 0, neutral: 0, bad: 0 });
+  };
+
+  const totalFeedback = reviews.good + reviews.neutral + reviews.bad;
+  const positiveFeedback = Math.round(
+    ((reviews.good + reviews.neutral) / totalFeedback) * 100
+  );
 
   return (
     <>
       <Description />
-      <Options reviewsTypes={reviewsTypes} updateFeedback={updateFeedback} />
-      <Feedback reviewsTypes={reviewsTypes} />
+
+      <Options
+        reviews={reviews}
+        handleClickForUpdate={updateFeedback}
+        totalNumber={totalFeedback}
+        handleClickForReset={resetFeedback}
+      />
+
+      {totalFeedback > 0 ? (
+        <Feedback
+          reviews={reviews}
+          totalNumber={totalFeedback}
+          numberOfPositive={positiveFeedback}
+        />
+      ) : (
+        <Notification />
+      )}
     </>
   );
 };
