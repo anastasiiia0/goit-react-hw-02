@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Description from '../Description/Description.jsx';
 import Options from '../Options/Options.jsx';
 import Feedback from '../Feedback/Feedback.jsx';
-import Notification from '../Notification/Notification';
+import Notification from '../Notification/Notification.jsx';
 
 const App = () => {
   const [reviews, setReviews] = useState(() => {
